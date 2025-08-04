@@ -1,0 +1,12 @@
+#
+# X startup file for Vme Intelligent PERipheral program
+# Log in from the terminal and viper starts as the only App
+#
+
+# Turn off the screensaver
+xset s off &
+
+# Start viper
+/usr/local/bin/viper 
+#xterm -geometry 80x24-0-0
+

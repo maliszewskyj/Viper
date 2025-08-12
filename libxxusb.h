@@ -1,4 +1,4 @@
-#include <libusb.h>
+#include <usb.h>
 
 #ifndef libxxusb_h
 #define libxxusb_h
@@ -60,7 +60,7 @@ long Num;
 
 struct xxusb_device_typ
 {
-  struct libusb_device *usbdev;
+  struct usb_device *usbdev;
   char SerialString[7];
 };
 
@@ -69,51 +69,51 @@ typedef unsigned char UCHAR;
 typedef struct usb_bus usb_busx;
 
 
-int xxusb_longstack_execute(libusb_device_handle *hDev, void *DataBuffer, int lDataLen, int timeout);
-int xxusb_bulk_read(libusb_device_handle *hDev, void *DataBuffer, int lDataLen, int timeout);
-int xxusb_bulk_write(libusb_device_handle *hDev, void *DataBuffer, int lDataLen, int timeout);
-int xxusb_usbfifo_read(libusb_device_handle *hDev, int *DataBuffer, int lDataLen, int timeout);
+int xxusb_longstack_execute(usb_dev_handle *hDev, void *DataBuffer, int lDataLen, int timeout);
+int xxusb_bulk_read(usb_dev_handle *hDev, void *DataBuffer, int lDataLen, int timeout);
+int xxusb_bulk_write(usb_dev_handle *hDev, void *DataBuffer, int lDataLen, int timeout);
+int xxusb_usbfifo_read(usb_dev_handle *hDev, int *DataBuffer, int lDataLen, int timeout);
 
-short xxusb_register_read(libusb_device_handle *hDev, short RegAddr, long *RegData);
-short xxusb_stack_read(libusb_device_handle *hDev, short StackAddr, long *StackData);
-short xxusb_stack_write(libusb_device_handle *hDev, short StackAddr, long *StackData);
-short xxusb_stack_execute(libusb_device_handle *hDev, long *StackData);
-short xxusb_register_write(libusb_device_handle *hDev, short RegAddr, long RegData);
-short xxusb_reset_toggle(libusb_device_handle *hDev);
+short xxusb_register_read(usb_dev_handle *hDev, short RegAddr, long *RegData);
+short xxusb_stack_read(usb_dev_handle *hDev, short StackAddr, long *StackData);
+short xxusb_stack_write(usb_dev_handle *hDev, short StackAddr, long *StackData);
+short xxusb_stack_execute(usb_dev_handle *hDev, long *StackData);
+short xxusb_register_write(usb_dev_handle *hDev, short RegAddr, long RegData);
+short xxusb_reset_toggle(usb_dev_handle *hDev);
 
 short xxusb_devices_find(xxusb_device_type *xxusbDev);
-short xxusb_device_close(libusb_device_handle *hDev);
-libusb_device_handle* xxusb_device_open(libusb_device *dev);
-short xxusb_flash_program(libusb_device_handle *hDev, char *config, short nsect);
-short xxusb_flashblock_program(libusb_device_handle *hDev, UCHAR *config);
-libusb_device_handle* xxusb_serial_open(char *SerialString);
+short xxusb_device_close(usb_dev_handle *hDev);
+usb_dev_handle* xxusb_device_open(struct usb_device *dev);
+short xxusb_flash_program(usb_dev_handle *hDev, char *config, short nsect);
+short xxusb_flashblock_program(usb_dev_handle *hDev, UCHAR *config);
+usb_dev_handle* xxusb_serial_open(char *SerialString);
 
-short VME_register_write(libusb_device_handle *hdev, long VME_Address, long Data);
-short VME_register_read(libusb_device_handle *hdev, long VME_Address, long *Data);
-short VME_LED_settings(libusb_device_handle *hdev, int LED, int code, int invert, int latch);
-short VME_DGG(libusb_device_handle *hdev, unsigned short channel, unsigned short trigger,unsigned short output, long delay, unsigned short gate, unsigned short invert, unsigned short latch);
+short VME_register_write(usb_dev_handle *hdev, long VME_Address, long Data);
+short VME_register_read(usb_dev_handle *hdev, long VME_Address, long *Data);
+short VME_LED_settings(usb_dev_handle *hdev, int LED, int code, int invert, int latch);
+short VME_DGG(usb_dev_handle *hdev, unsigned short channel, unsigned short trigger,unsigned short output, long delay, unsigned short gate, unsigned short invert, unsigned short latch);
 
-short VME_Output_settings(libusb_device_handle *hdev, int Channel, int code, int invert, int latch);
+short VME_Output_settings(usb_dev_handle *hdev, int Channel, int code, int invert, int latch);
 
-short VME_read_16(libusb_device_handle *hdev,short Address_Modifier, long VME_Address, long *Data);
-short VME_read_32(libusb_device_handle *hdev, short Address_Modifier, long VME_Address, long *Data);
-short VME_BLT_read_32(libusb_device_handle *hdev, short Address_Modifier, int count, long VME_Address, long Data[]);
-short VME_write_16(libusb_device_handle *hdev, short Address_Modifier, long VME_Address, long Data);
-short VME_write_32(libusb_device_handle *hdev, short Address_Modifier, long VME_Address, long Data);
+short VME_read_16(usb_dev_handle *hdev,short Address_Modifier, long VME_Address, long *Data);
+short VME_read_32(usb_dev_handle *hdev, short Address_Modifier, long VME_Address, long *Data);
+short VME_BLT_read_32(usb_dev_handle *hdev, short Address_Modifier, int count, long VME_Address, long Data[]);
+short VME_write_16(usb_dev_handle *hdev, short Address_Modifier, long VME_Address, long Data);
+short VME_write_32(usb_dev_handle *hdev, short Address_Modifier, long VME_Address, long Data);
 
-short CAMAC_DGG(libusb_device_handle *hdev, short channel, short trigger, short output, int delay, int gate, short invert, short latch);
-short CAMAC_register_read(libusb_device_handle *hdev, int A, long *Data);
-short CAMAC_register_write(libusb_device_handle *hdev, int A, long Data);
-short CAMAC_LED_settings(libusb_device_handle *hdev, int LED, int code, int invert, int latch);
-short CAMAC_Output_settings(libusb_device_handle *hdev, int Channel, int code, int invert, int latch);
-short CAMAC_read_LAM_mask(libusb_device_handle *hdev, long *Data);
-short CAMAC_write_LAM_mask(libusb_device_handle *hdev, long Data);
+short CAMAC_DGG(usb_dev_handle *hdev, short channel, short trigger, short output, int delay, int gate, short invert, short latch);
+short CAMAC_register_read(usb_dev_handle *hdev, int A, long *Data);
+short CAMAC_register_write(usb_dev_handle *hdev, int A, long Data);
+short CAMAC_LED_settings(usb_dev_handle *hdev, int LED, int code, int invert, int latch);
+short CAMAC_Output_settings(usb_dev_handle *hdev, int Channel, int code, int invert, int latch);
+short CAMAC_read_LAM_mask(usb_dev_handle *hdev, long *Data);
+short CAMAC_write_LAM_mask(usb_dev_handle *hdev, long Data);
 
-short CAMAC_write(libusb_device_handle *hdev, int N, int A, int F, long Data, int *Q, int *X);
-short CAMAC_read(libusb_device_handle *hdev, int N, int A, int F, long *Data, int *Q, int *X);
-short CAMAC_Z(libusb_device_handle *hdev);
-short CAMAC_C(libusb_device_handle *hdev);
-short CAMAC_I(libusb_device_handle *hdev, int inhibit); 
+short CAMAC_write(usb_dev_handle *hdev, int N, int A, int F, long Data, int *Q, int *X);
+short CAMAC_read(usb_dev_handle *hdev, int N, int A, int F, long *Data, int *Q, int *X);
+short CAMAC_Z(usb_dev_handle *hdev);
+short CAMAC_C(usb_dev_handle *hdev);
+short CAMAC_I(usb_dev_handle *hdev, int inhibit); 
 
 #ifdef __cplusplus
 }

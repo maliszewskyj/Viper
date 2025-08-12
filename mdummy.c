@@ -54,17 +54,18 @@ void mdum_axis_init(mdummod * mptr) {
   }
 }
 
-int MAXv_status(ClientData clientdata, Tcl_Interp *interp,
+int mdum_status(ClientData clientdata, Tcl_Interp *interp,
 		int objc, Tcl_Obj * objv[]) {
   char ax;
   char * strval;
   int lstr, axisno;
+  mdummod * mptr;
 
   if (objc < 2) {
     Tcl_SetResult(interp,"Syntax: mdumn status <axis> <parameter>",TCL_STATIC);
     return TCL_ERROR;
   }
-
+  mptr = (mdummod *) clientdata;
   Tcl_GetIntFromObj(interp,objv[0],&axisno);
   if (axisno < 0 || axisno > 7) {
     Tcl_SetResult(interp,"Axis out of bounds",TCL_STATIC);
@@ -85,13 +86,11 @@ int MAXv_status(ClientData clientdata, Tcl_Interp *interp,
     Tcl_SetObjResult(interp,Tcl_NewIntObj(0));
     return TCL_OK;
   } else if (!strncmp("enabled",strval,ax)) {
-    Tcl_SetObjResult(interp,Tcl_NewIntObj(mptr->axis[axisno].enable));
+    Tcl_SetObjResult(interp,Tcl_NewIntObj(1));
     return TCL_OK;
   } else if (!strncmp("fault",strval,ax)) {
     Tcl_SetObjResult(interp,Tcl_NewIntObj(0));
     return TCL_OK;
-  } else if (!strncmp("register",strval,lstr)) {
-    return MAXv_register(clientdata,interp);
   } else if (!strncmp("home",strval,lstr)) {
     Tcl_SetObjResult(interp,Tcl_NewIntObj(0));
     return TCL_OK;
@@ -134,6 +133,22 @@ int mdum_position(ClientData clientdata, Tcl_Interp *interp,
   return TCL_OK;
 }
 
+int mdum_enable(ClientData clientdata, Tcl_Interp *interp,
+		int objc, Tcl_Obj * objv[],int val) {
+    mdummod * mptr;
+    int axisno;
+  if (!objc) {
+    Tcl_SetResult(interp,"Usage: mdummy enable position <axis> ?state?\n",
+		  TCL_STATIC);
+    return TCL_ERROR;
+  }
+  Tcl_GetIntFromObj(interp,objv[0],&axisno);
+
+    
+  mptr = (mdummod *) clientdata;
+  mptr->axis[axisno].enable = (val)? 1: 0;
+  return TCL_OK;
+}
 
 int mdum_command(ClientData clientdata, Tcl_Interp *interp,
 		 int objc, Tcl_Obj * objv[]) 
@@ -156,30 +171,27 @@ int mdum_command(ClientData clientdata, Tcl_Interp *interp,
   if (!strncmp(strval,"status",lstr)) {
     return mdum_status(clientdata,interp,objc-2,objv+2);
   } else if (!strncmp(strval,"stop",lstr)) {
-    return mdum_stop(clientdata,interp,objc-2,objv+2);
+    return TCL_OK;//mdum_stop(clientdata,interp,objc-2,objv+2);
   } else if (!strncmp(strval,"move",lstr)) {
-    return mdum_move(clientdata,interp,objc-2,objv+2);
+    return TCL_OK;//mdum_move(clientdata,interp,objc-2,objv+2);
   } else if (!strncmp(strval,"delta",lstr)) {
-    return mdum_delta(clientdata,interp,objc-2,objv+2);
+    return TCL_OK;//mdum_delta(clientdata,interp,objc-2,objv+2);
   } else if (!strncmp(strval,"position",lstr)) {
     return mdum_position(clientdata,interp,objc-2,objv+2);
   } else if (!strncmp(strval,"configure",lstr)) {
-    return mdum_conf(clientdata,interp,objc-2,objv+2);
+    return TCL_OK; //mdum_conf(clientdata,interp,objc-2,objv+2);
   } else if (!strncmp(strval,"enable",lstr)) {
     return mdum_enable(clientdata,interp,objc-2,objv+2,1);
   } else if (!strncmp(strval,"disable",lstr)) {
     return mdum_enable(clientdata,interp,objc-2,objv+2,0);
   } else if (!strncmp(strval,"debug",lstr)) {
     if (objc < 3) {
-      Tcl_SetObjResult(interp,Tcl_NewIntObj(maxvdebug));
+      Tcl_SetObjResult(interp,Tcl_NewIntObj(mdumdebug));
       return TCL_OK;
     }
     if ((retn = Tcl_GetIntFromObj(interp,objv[2],&ival)) != TCL_OK) 
       return retn;
-    maxvdebug = ival;
-    return TCL_OK;
-  } else if (!strncmp(strval,"version",lstr)) {
-    Tcl_SetObjResult(interp,Tcl_NewStringObj(cvsid,strlen(cvsid)));
+    mdumdebug = ival;
     return TCL_OK;
   } else {
     Tcl_SetResult(interp,
@@ -203,7 +215,7 @@ int mdummy(ClientData clientdata, Tcl_Interp *interp,
 
   if (objc < 3) {
     Tcl_SetResult(interp,
-		  "Usage: maxv create address",
+		  "Usage: mdummy create address",
 		  TCL_STATIC);
     return TCL_ERROR;
   }

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=QViper
+Exec=/home/ncnr/bin/viper
+Comment=
+Terminal=false
+Icon=viper.png
+Type=Application
+StartupNotify=false
+Categories=Utility

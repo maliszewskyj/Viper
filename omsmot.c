@@ -750,10 +750,11 @@ int oms_osc(ClientData clientdata, Tcl_Interp *interp,
   lopulse = (int) ((lo * res)/ optr->axis[axisno].dscale);
   hipulse = (int) ((hi * res)/ optr->axis[axisno].dscale);
 
-  sprintf(omsbuf,"A%c IC VL%d ",ax,speed);
+  sprintf(omsbuf,"A%c IC VL%d; ",ax,speed);
   sprintf(tmpbuf,"WH MA%d; GO MA%d; GO WG ",lopulse,hipulse);
   strcat(omsbuf,tmpbuf);
 
+  //printf("oms_osc: %s\n",omsbuf);
   if ((lstr = OMS_talk(optr->base, omsbuf)) > 0) {
     Tcl_SetResult(interp,"Oscillation started",TCL_STATIC);
   }

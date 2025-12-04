@@ -135,7 +135,7 @@ proc MotorMove { axis destination } {
 	return -code error "Bad axis identifier: $axis"
     }
 
-    if {!$mc(${axis},axis_en)} {
+    if {!$mc($axis,axis_en)} {
 	return -code error "Axis disabled"
     }
 
@@ -145,7 +145,7 @@ proc MotorMove { axis destination } {
     #	    return -code error "Motion pending"
     #	}
     #    }
-    if {$mc(${axis},moving)} {
+    if {$mc($axis,moving)} {
 	return -code error "Motion pending"
     }
 
@@ -191,11 +191,11 @@ proc MotorStartOsc { axis center halfamp } {
 	return -code error "Bad axis identifier: $axis"
     }
 
-    if {!$mc(${axis},axis_en)} {
+    if {!$mc($axis,axis_en)} {
 	return -code error "Axis disabled"
     }
 
-    if {$mc(${axis},moving)} {
+    if {$mc($axis,moving)} {
 	return -code error "Motion pending"
     }
 
@@ -233,11 +233,11 @@ proc MotorStopOsc { axis } {
 	return -code error "Bad axis identifier: $axis"
     }
 
-    if {!$mc(${axis},axis_en)} {
+    if {!$mc($axis,axis_en)} {
 	return -code error "Axis disabled"
     }
 
-    if {!$mc(${axis},moving)} {
+    if {!$mc($axis,moving)} {
 	return -code error "No motion pending"
     }
     catch {Logger "motor oscillate stop $axis"}
@@ -252,11 +252,11 @@ proc MotorDelta { axis increment } {
 	return -code error "Bad axis identifier: $axis"
     }
 
-    if {!$mc(${axis},axis_en)} {
+    if {!$mc($axis,axis_en)} {
 	return -code error "Axis disabled"
     }
 
-    if {$mc(${axis},moving)} {
+    if {$mc($axis,moving)} {
 	return -code error "Motion pending"
     }
 
@@ -335,17 +335,17 @@ proc MotorJog { axis direction } {
 	}
     }
 
-    if {!$mc(${axis},axis_en)} {
+    if {!$mc($axis,axis_en)} {
 	return -code error "Axis disabled"
     }
 
-    if [catch {$mc(${axis},motcmd) jog $mc(${axis},motax) $direction} result] {
+    if [catch {$mc($axis,motcmd) jog $mc($axis,motax) $direction} result] {
 	puts $result
 	return -code error $result
     }
 
     set mc(moving) 1
-    set mc(${axis},moving)
+    set mc($axis,moving)
     set ticks [expr int($mc(poll) * 1000)]
     after $ticks MotorProgress $axis    
     return "Jogging axis $axis at $mc($axis,velocity)"
@@ -361,18 +361,18 @@ proc MotorHome { axis direction } {
 	}
     }
 
-    if {!$mc(${axis},axis_en)} {
+    if {!$mc($axis,axis_en)} {
 	return -code error "Axis disabled"
     }
 
     catch {Logger "motor home $axis $direction"}
-    if [catch {$mc(${axis},motcmd) home $mc(${axis},motax) $direction} result] {
+    if [catch {$mc($axis,motcmd) home $mc($axis,motax) $direction} result] {
 	puts $result
 	return -code error $result
     }
 
     set mc(moving) 1
-    set mc(${axis},moving)
+    set mc($axis,moving)
     set ticks [expr int($mc(poll) * 1000)]
     after $ticks MotorProgress $axis    
     return "Homing axis $axis"
@@ -388,22 +388,22 @@ proc MotorFindLim { axis direction } {
 	}
     }
 
-    if {!$mc(${axis},axis_en)} {
+    if {!$mc($axis,axis_en)} {
 	return -code error "Axis disabled"
     }
-    if {$mc(${axis},moving)} {
+    if {$mc($axis,moving)} {
 	return -code error "Motion pending"
     }
 
     # Jog to limit
     catch {Logger "motor findlim $axis $direction"}
-    if [catch {$mc(${axis},motcmd) jog $mc(${axis},motax) $direction} result] {
+    if [catch {$mc($axis,motcmd) jog $mc($axis,motax) $direction} result] {
 	catch {Logger "  findlim failed: $result"}
 	puts $result
 	return -code error $result
     }
     set mc(moving) 1
-    set mc(${axis},moving) 1
+    set mc($axis,moving) 1
     set ticks [expr int($mc(poll) * 1000)]
     after $ticks MotorProgress $axis    
     return "Finding $direction limit for axis $axis"
@@ -546,36 +546,36 @@ proc MotorConfigLoad { axis } {
     global mc
 
     #maxv0 debug 1
-    set encmode $mc(${axis},encmode)
+    set encmode $mc($axis,encmode)
     puts "Configure axis $axis motor"
     if {($mc($axis,encmod) != $mc($axis,motmod)) && $encmode} {
 	set encmode 0
     }
-    if [catch {$mc($axis,motcmd) configure $mc(${axis},motax) \
-	    -driveres $mc(${axis},dres) \
-	    -encres   $mc(${axis},eres) \
-	    -is_servo $mc(${axis},is_servo) \
-            -enable_high $mc(${axis},enable_high) \
-	    -limitparity $mc(${axis},limit_high) \
+    if [catch {$mc($axis,motcmd) configure $mc($axis,motax) \
+	    -driveres $mc($axis,dres) \
+	    -encres   $mc($axis,eres) \
+	    -is_servo $mc($axis,is_servo) \
+            -enable_high $mc($axis,enable_high) \
+	    -limitparity $mc($axis,limit_high) \
 	    -encmode  $encmode \
-	    -posmaintenance $mc(${axis},pm_en) \
-	    -dscale   $mc(${axis},dscale) \
-	    -bscale   $mc(${axis},bscale) \
-	    -vscale   $mc(${axis},vscale) \
-	    -ascale   $mc(${axis},ascale) \
-	    -stalldetection $mc(${axis},sd_en) \
-	    -deadband $mc(${axis},deadband) \
-	    -enable $mc(${axis},axis_en) \
-	    -limits $mc(${axis},limit_en) 
+	    -posmaintenance $mc($axis,pm_en) \
+	    -dscale   $mc($axis,dscale) \
+	    -bscale   $mc($axis,bscale) \
+	    -vscale   $mc($axis,vscale) \
+	    -ascale   $mc($axis,ascale) \
+	    -stalldetection $mc($axis,sd_en) \
+	    -deadband $mc($axis,deadband) \
+	    -enable $mc($axis,axis_en) \
+	    -limits $mc($axis,limit_en) 
 	} result ] {
 	return -code error $result
     }
     #puts $result
 
     set eres [expr $mc($axis,eres) / $mc($axis,dscale)]
-    if {$mc(${axis},motmod) != $mc(${axis},encmod)} {
+    if {$mc($axis,motmod) != $mc($axis,encmod)} {
         #puts "   -- Configure external encoder"
-	if [catch {$mc($axis,enccmd) configure $mc(${axis},encax) \
+	if [catch {$mc($axis,enccmd) configure $mc($axis,encax) \
 		   -resolution $eres \
 		   -databits $mc($axis,ssibits) \
 		   -gray 1 \
@@ -718,13 +718,13 @@ proc MotorEnable { args } {
     }
 
     foreach axis $axislist {
-	if {$mc(${axis},moving)} {
+	if {$mc($axis,moving)} {
 	    set result "Cannot $action motor $axis while it is moving"
 	    return -code error $result
 	}
-	set mc(${axis},axis_en) $state
+	set mc($axis,axis_en) $state
 	catch {Logger "motor $action $axis"}
-	if [catch {$mc(${axis},motcmd) $action $mc(${axis},motax) axis $state} \
+	if [catch {$mc($axis,motcmd) $action $mc($axis,motax) axis $state} \
 		result] {
 	    # Write message to status panel
 	    set comm(command) $result
@@ -735,14 +735,14 @@ proc MotorEnable { args } {
 
     # Make sure motor has been enabled or not
     foreach axis $axislist {
-	if [catch {$mc(${axis},motcmd) status $mc(${axis},motax) \
+	if [catch {$mc($axis,motcmd) status $mc($axis,motax) \
 		enabled} result] {
-	    if [catch {$mc(${axis},motcmd) status $mc(${axis},motax) \
+	    if [catch {$mc($axis,motcmd) status $mc($axis,motax) \
 			   enabled} result] {
 		return -code error $result
 	    }
 	}
-	set mc(${axis},axis_en) $result
+	set mc($axis,axis_en) $result
 	catch {MotorStatusPanelUpdate $axis}    
 	if { $result != $state } {
 	    return -code error "Could not change state of axis $axis"
@@ -767,11 +767,11 @@ proc MotorIsEnabled { args } {
 
     set response {}
     foreach axis $axislist {
-	if [catch {$mc(${axis},motcmd) status $mc(${axis},motax) \
+	if [catch {$mc($axis,motcmd) status $mc($axis,motax) \
 		enabled} result] {
 	    return -code error $result
 	}
-	set mc(${axis},axis_en) $result
+	set mc($axis,axis_en) $result
 	lappend response $result
     }
     return $response
@@ -785,7 +785,7 @@ proc MotorVelocity { args } {
 	return -code error "Bad axis identifier: $axis"
     }
 
-    set velocity [expr $mc({$axis},dscale) * $mc({$axis},vscale)]
+    set velocity [expr $mc($axis,dscale) * $mc($axis,vscale)]
 
     return $velocity
 }
@@ -798,7 +798,7 @@ proc MotorAcceleration { args } {
 	return -code error "Bad axis identifier: $axis"
     }
 
-    set acceleration [expr $mc({$axis},dscale) * $mc({$axis},ascale)]
+    set acceleration [expr $mc($axis,dscale) * $mc($axis,ascale)]
 
     return $acceleration
     
@@ -838,7 +838,7 @@ proc ManageACS { in } {
 	}
     }
     set dres 400  ;# Assume half-stepping
-    set conversion [expr $mc(${axis},dscale) / $dres]
+    set conversion [expr $mc($axis,dscale) / $dres]
     switch $cmd {
 	P { 
 	    # Position enter/examine
@@ -896,12 +896,12 @@ proc ManageACS { in } {
 	    } else {
 		set pos 0
 		set neg 0
-		if {$mc(${axis},limstat) > 0} {
+		if {$mc($axis,limstat) > 0} {
 		    set pos +
-		} elseif {$mc(${axis},limstat) < 0} {
+		} elseif {$mc($axis,limstat) < 0} {
 		    set neg -
 		}
-		if {$mc(${axis},moving)} {
+		if {$mc($axis,moving)} {
 		    set moving S
 		} else {
 		    set moving 0
@@ -929,7 +929,7 @@ proc ManageACS { in } {
 		if [catch {motor $motorarg $axis}] { return -code error ${ax}? }
 		return $ax
 	    } else {
-		if {$mc(${axis},axis_en)} {
+		if {$mc($axis,axis_en)} {
 		    set motorarg 1
 		} else {
 		    set motorarg 0

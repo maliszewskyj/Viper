@@ -555,7 +555,8 @@ proc MotorConfigLoad { axis } {
 	    -driveres $mc($axis,dres) \
 	    -encres   $mc($axis,eres) \
 	    -is_servo $mc($axis,is_servo) \
-            -enable_high $mc($axis,enable_high) \
+	    -enable_high $mc($axis,enable_high) \
+	    -homeparity $mc($axis,home_parity) \
 	    -limitparity $mc($axis,limit_high) \
 	    -encmode  $encmode \
 	    -posmaintenance $mc($axis,pm_en) \

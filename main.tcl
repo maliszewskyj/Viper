@@ -2,7 +2,8 @@
 #
 # Version - $Id: main.tcl,v 1.28 2015/06/13 18:59:10 nickm Exp $
 #
-set appdebug 0
+# Temp turn on appdebug
+set appdebug 1
 if {[lsearch $argv "-debug"] != -1} { set appdebug 1 }
 
 if [info exists env(BTXROOT)] {
@@ -16,6 +17,7 @@ if [info exists env(BTXROOT)] {
 load ${rootdir}/libbtxvme.so
 set log_file "viper_err.log"
 set userlog  "viper.log"
+set lock_file $::env(HOME)/QViper.lock
 
 # Source dependent scripts
 set version {$Id: main.tcl,v 1.28 2015/06/13 18:59:10 nickm Exp $}
@@ -46,7 +48,37 @@ proc bgerror { arg } {
    if $close_log_file {
       close $fileId
    }
-}                                                                               
+}
+
+proc acquire_lock { lock_file } {
+    if {[catch {$lock_file {CREAT WRONLY EXCL}} fh]} {
+	# If 'open' fails, the flie likely exists (lock is held)
+	return ""
+    } else {
+	# If 'open' succeeds, we have the lock. Write the PID, application, 
+	puts $fh [pid]
+	puts $fh "viper"
+	puts $fh [hostname]
+	puts $fh "blahblahblah"
+	puts $fh "halbhalbhalb"
+	close $fh; # Close it immediately to allow others to read/delete
+	return $lock_file
+    }
+}
+
+proc release_lock { lock_file } {
+    if {[file exists $lock_file]} {
+	file delete $lock_file
+	puts "Lock released."
+    }
+}
+
+proc Exit_Gracefully {} {
+    global lock_file
+    catch {release_lock $lock_file}
+    catch {MotorSave}
+    exit
+}
 
 # Make sure we start in a pristine state
 catch {scaler reset}
@@ -90,6 +122,7 @@ fileevent $comm(chan) readable {
 		set output "OK:$result@$comm(command)\r"
 	    }
 	}
+	if {$appdebug} { puts "REPLY  : $output" }
 	puts -nonewline $comm(chan) $output
 	flush $comm(chan)
     }

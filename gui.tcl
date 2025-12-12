@@ -710,7 +710,8 @@ proc CommStatPanel { p } {
     set pfc [entry $pf.comm -textvariable comm(command) -width 40 \
 	    -relief sunken -background white]
     set pfn [button $pf.next -text "Next" -command DisplayCycle]
-    set pfe [button $pf.exit -text "Exit" -command "MotorSave; exit"]
+    #set pfe [button $pf.exit -text "Exit" -command "MotorSave; exit"]
+    set pfe [button $pf.exit -text "Exit" -command Exit_Gracefully]
     if {![string match $env(DISPLAY) ":0.0"]} {
         #$pfe configure -state disabled
     }

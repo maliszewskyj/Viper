@@ -67,6 +67,7 @@ foreach i $mc(defined) {
     set mc($i,slipstat)    0
     set mc($i,destination) 0.0000
     set mc($i,increment)   1.0000
+    set mc($i,home_parity) 0
 }
 catch {unset i}
 
